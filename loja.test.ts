@@ -1,10 +1,18 @@
 import { Loja } from './loja';
 import { Endereco } from './endereco';
+import { Venda } from './venda';
 
 
 function verificaCampoObrigatorio(mensagemEsperada: string, loja: Loja) {
   try {
     loja.dados_loja();
+  } catch (e) {
+    expect(e.message).toBe(mensagemEsperada);
+  }
+}
+function verificaCampoObrigatorioVenda(mensagemEsperada: string, venda: Venda) {
+  try {
+    venda.dados_vendas();
   } catch (e) {
     expect(e.message).toBe(mensagemEsperada);
   }
@@ -93,7 +101,8 @@ Bai 1 - Mun 1 - E1
 CEP:11111-111 Tel (11) 1111-1111
 Obs 1
 CNPJ: 11.111.111/1111-11
-IE: 123456789`
+IE: 123456789
+`;
 
 const TEXTO_ESPERADO_SEM_NUMERO_SEM_COMPLEMENTO_SEM_BAIRRO: string = `Loja 1
 Log 1, s/n
@@ -101,7 +110,8 @@ Mun 1 - E1
 CEP:11111-111 Tel (11) 1111-1111
 Obs 1
 CNPJ: 11.111.111/1111-11
-IE: 123456789`
+IE: 123456789
+`;
 
 
 test('Loja Completa', () => {
@@ -216,22 +226,45 @@ test('Número zero, complemento e bairro vazios', () => {
     .toBe(TEXTO_ESPERADO_SEM_NUMERO_SEM_COMPLEMENTO_SEM_BAIRRO);
 });
 
+let loja_completa = new Loja (NOME_LOJA, new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, MUNICIPIO, ESTADO, CEP), TELEFONE, OBSERVACAO, CNPJ, INSCRICAO_ESTADUAL)
+let datahora = new Date(2020, 10, 29, 18, 5, 43)
+let ccf = "1234"
+let coo = "123456"
+let COO_VALIDACAO = new Venda(loja_completa, datahora, ccf, "")
+let CCF_VALIDACAO = new Venda(loja_completa, datahora, "", coo)
+
+test( "validação de coo", () => {
+  verificaCampoObrigatorioVenda( "O campo de coo é obrigatório", COO_VALIDACAO )
+} )
+
+test( "validação de ccf", () => {
+  verificaCampoObrigatorioVenda( "O campo de ccf é obrigatório", CCF_VALIDACAO )
+} )
+
 
 test('Exercício 2 - customizado', () => {
 
   // Defina seus próprios valores para as variáveis a seguir
-  let nome_loja = "";
-  let logradouro = "";
-  let numero = 0;
-  let complemento = "";
-  let bairro = "";
-  let municipio = "";
-  let estado = "";
-  let cep = "";
-  let telefone = "";
-  let observacao = "";
-  let cnpj = "";
-  let inscricao_estadual = "";
+  let nome_loja = "Smelly Cat";
+  let logradouro = "Rua Etheria";
+  let numero = 205;
+  let complemento = "Perto da velhinha que mora em uma caverna";
+  let bairro = "Br. Templo do Cristal";
+  let municipio = "Beach City";
+  let estado = "BC";
+  let cep = "78051-604";
+  let telefone = "(66)4002-8922";
+  let observacao = "Por Favor ignorar os exército Intergalácticos em guerra tentando dominar o planeta";
+  let cnpj = "53.409.609/0001-85";
+  let inscricao_estadual = "512.670.302.653";
+  
+  let expected = "Smelly Cat\n";
+  expected += "Rua Etheria, 205 Perto da velhinha que mora em uma caverna\n";
+  expected += "Br. Templo do Cristal - Beach City - BC\n";
+  expected += "CEP:78051-604 Tel (66)4002-8922\n";
+  expected += "Por Favor ignorar os exército Intergalácticos em guerra tentando dominar o planeta\n";
+  expected +="CNPJ: 53.409.609/0001-85\n";
+  expected += "IE: 512.670.302.653\n";
 
   let endereco_customizado: Endereco = new Endereco(logradouro, numero,
     complemento, bairro, municipio, estado, cep);
@@ -240,7 +273,5 @@ test('Exercício 2 - customizado', () => {
     inscricao_estadual);
 
   //E atualize o texto esperado abaixo
-  expect(loja_customizada.dados_loja()).toBe(
-    `
-`);
+  expect(loja_customizada.dados_loja()).toBe(expected);
 });
